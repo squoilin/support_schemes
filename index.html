@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU & Neighbors Renewable Energy Support Schemes</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: "Segoe UI", Arial, sans-serif; background-color: #f4f6f9; }
+        #map { height: 100vh; width: 100vw; }
+        .info-panel {
+            padding: 15px 20px;
+            font: 14px/18px Arial, Helvetica, sans-serif;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            width: 320px;
+            pointer-events: none; 
+        }
+        .info-panel h4 { margin: 0 0 10px; color: #333; font-size: 18px; border-bottom: 2px solid #005A9C; padding-bottom: 5px; }
+        .info-panel p { margin: 5px 0; font-size: 13px; line-height: 1.4; color: #444; }
+        .info-panel strong { color: #005A9C; }
+        .legend {
+            line-height: 24px;
+            color: #555;
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            max-width: 300px;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.8;
+            border-radius: 3px;
+        }
+        .title-box {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .title-box h2 { margin: 0; color: #005A9C; font-size: 22px; }
+        .title-box p { margin: 5px 0; font-size: 13px; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="title-box">
+    <h2>EU & Neighbors Support Schemes (2024-2026)</h2>
+    <p>Hover over a country to see detailed policies.</p>
+    <select id="tech-select" style="margin-top: 8px; padding: 5px; font-size: 14px; border-radius: 4px;">
+        <option value="ground">Ground-mounted PV / Primary</option>
+        <option value="rooftop">Rooftop Solar PV</option>
+        <option value="onshore">Onshore Wind</option>
+        <option value="offshore">Offshore Wind</option>
+        <option value="co2">CO2 Incentives / Quotas</option>
+    </select>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map').setView([54.505, 15.09], 4);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO & GISCO',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
+
+    const CATEGORIES = {
+        CFD_FIP: 'CfDs & Market Premiums',
+        TENDERS: 'Tenders/Auctions (Fixed/PAB)',
+        MERCHANT: 'Merchant / Corporate PPAs',
+        QUOTA_CERT: 'Quota / Green Certificates',
+        FIT: 'Feed-in Tariffs (Fixed)',
+        NET_BILLING_METERING: 'Net Billing / Net Metering',
+        SUBSIDIES: 'Investment Subsidies / Grants',
+        ETS_TAX: 'ETS + Carbon Tax/Levy',
+        ETS_ONLY: 'ETS Only',
+        MIXED: 'Mixed Policies / Transitioning',
+        NO_DATA: 'Information not available / N/A'
+    };
+
+    const COLORS = {
+        [CATEGORIES.CFD_FIP]: '#1f77b4',   
+        [CATEGORIES.TENDERS]: '#ff7f0e',   
+        [CATEGORIES.MERCHANT]: '#2ca02c',  
+        [CATEGORIES.QUOTA_CERT]: '#d62728',
+        [CATEGORIES.FIT]: '#9467bd',       
+        [CATEGORIES.NET_BILLING_METERING]: '#17becf',
+        [CATEGORIES.SUBSIDIES]: '#e377c2',
+        [CATEGORIES.ETS_TAX]: '#8c564b',
+        [CATEGORIES.ETS_ONLY]: '#bcbd22',
+        [CATEGORIES.MIXED]: '#7f7f7f',     
+        [CATEGORIES.NO_DATA]: '#cccccc'    
+    };
+
+    const rawData = {
+        "DE": {
+                "Country": "Germany",
+                "rooftop": {
+                        "scheme": "Fixed FiT or Sliding Premium.",
+                        "ref": "EEG 2023/2024"
+                },
+                "ground": {
+                        "scheme": "Sliding Market Premium (FiP).",
+                        "ref": "EEG 2023/2024"
+                },
+                "onshore": {
+                        "scheme": "Sliding Market Premium (FiP).",
+                        "ref": "EEG 2023/2024"
+                },
+                "offshore": {
+                        "scheme": "Specific Tenders/Auctions.",
+                        "ref": "WindSeeG"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National ETS (nEHS) carbon pricing.",
+                        "ref": "BEHG"
+                }
+        },
+        "FR": {
+                "Country": "France",
+                "rooftop": {
+                        "scheme": "Open-door FiT & Investment Premium.",
+                        "ref": "CRE, Arr\u00eat\u00e9 Tarifaire"
+                },
+                "ground": {
+                        "scheme": "Two-way CfDs via Tenders.",
+                        "ref": "CRE Tenders"
+                },
+                "onshore": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "CRE Tenders"
+                },
+                "offshore": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "CRE Tenders"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Carbon Tax.",
+                        "ref": "Code des douanes"
+                }
+        },
+        "ES": {
+                "Country": "Spain",
+                "rooftop": {
+                        "scheme": "Investment Subsidies & Net Billing.",
+                        "ref": "RD 244/2019"
+                },
+                "ground": {
+                        "scheme": "REER Pay-as-bid Tender.",
+                        "ref": "REER"
+                },
+                "onshore": {
+                        "scheme": "REER Pay-as-bid Tender.",
+                        "ref": "REER"
+                },
+                "offshore": {
+                        "scheme": "POEM Tenders.",
+                        "ref": "Real Decreto 150/2023"
+                },
+                "co2": {
+                        "scheme": "EU ETS + specific fluorinated gas taxes.",
+                        "ref": "Law 1/2005"
+                }
+        },
+        "IT": {
+                "Country": "Italy",
+                "rooftop": {
+                        "scheme": "Investment Tax Credits & Energy Communities.",
+                        "ref": "Superbonus, CER"
+                },
+                "ground": {
+                        "scheme": "Two-way CfDs (Sliding FiP).",
+                        "ref": "FER 1 Decree"
+                },
+                "onshore": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "FER 1 Decree"
+                },
+                "offshore": {
+                        "scheme": "Two-way CfDs (FER 2).",
+                        "ref": "FER 2 Decree"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "NL": {
+                "Country": "Netherlands",
+                "rooftop": {
+                        "scheme": "Net Metering (facing phase-out).",
+                        "ref": "Salderingsregeling"
+                },
+                "ground": {
+                        "scheme": "SDE++ Scheme (Sliding FiP/CfD).",
+                        "ref": "SDE++"
+                },
+                "onshore": {
+                        "scheme": "SDE++ Scheme.",
+                        "ref": "SDE++"
+                },
+                "offshore": {
+                        "scheme": "SDE++ & tender rounds.",
+                        "ref": "SDE++ / Wind op zee"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Carbon Tax for Industry.",
+                        "ref": "Wet CO2-heffing"
+                }
+        },
+        "PL": {
+                "Country": "Poland",
+                "rooftop": {
+                        "scheme": "Net Billing & Investment Subsidies.",
+                        "ref": "M\u00f3j Pr\u0105d"
+                },
+                "ground": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "RES Act Auctions"
+                },
+                "onshore": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "RES Act Auctions"
+                },
+                "offshore": {
+                        "scheme": "Dedicated phased Tenders (CfDs).",
+                        "ref": "Offshore Act"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "SE": {
+                "Country": "Sweden",
+                "rooftop": {
+                        "scheme": "Tax Credits/Deductions.",
+                        "ref": "Gr\u00f6n Teknik"
+                },
+                "ground": {
+                        "scheme": "Merchant / Corporate PPAs.",
+                        "ref": "Market mechanisms"
+                },
+                "onshore": {
+                        "scheme": "Merchant / Corporate PPAs.",
+                        "ref": "Market mechanisms"
+                },
+                "offshore": {
+                        "scheme": "Merchant / Corporate PPAs.",
+                        "ref": "Market mechanisms"
+                },
+                "co2": {
+                        "scheme": "EU ETS + High National Carbon Tax.",
+                        "ref": "Koldioxidskatt"
+                }
+        },
+        "DK": {
+                "Country": "Denmark",
+                "rooftop": {
+                        "scheme": "Net Settlement & local integration.",
+                        "ref": "Danish Energy Agency"
+                },
+                "ground": {
+                        "scheme": "Two-way CfDs / Sliding Premiums.",
+                        "ref": "DEA Tenders"
+                },
+                "onshore": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "DEA Tenders"
+                },
+                "offshore": {
+                        "scheme": "Dedicated Tenders (incl. negative bidding).",
+                        "ref": "DEA Tenders"
+                },
+                "co2": {
+                        "scheme": "EU ETS + Danish Carbon Tax.",
+                        "ref": "Green Tax Reform"
+                }
+        },
+        "AT": {
+                "Country": "Austria",
+                "rooftop": {
+                        "scheme": "Investment Grants.",
+                        "ref": "EAG"
+                },
+                "ground": {
+                        "scheme": "Market Premiums (Sliding FiP).",
+                        "ref": "EAG Auctions"
+                },
+                "onshore": {
+                        "scheme": "Market Premiums.",
+                        "ref": "EAG Auctions"
+                },
+                "offshore": {
+                        "scheme": "N/A.",
+                        "ref": "-"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Carbon Pricing (NEHG).",
+                        "ref": "NEHG 2022"
+                }
+        },
+        "IE": {
+                "Country": "Ireland",
+                "rooftop": {
+                        "scheme": "Clean Export Guarantee & Grants.",
+                        "ref": "MSS / CRU"
+                },
+                "ground": {
+                        "scheme": "RESS (Two-way CfDs).",
+                        "ref": "RESS"
+                },
+                "onshore": {
+                        "scheme": "RESS (Two-way CfDs).",
+                        "ref": "RESS"
+                },
+                "offshore": {
+                        "scheme": "ORESS Tenders.",
+                        "ref": "ORESS"
+                },
+                "co2": {
+                        "scheme": "EU ETS + Carbon Tax.",
+                        "ref": "Finance Act"
+                }
+        },
+        "GR": {
+                "Country": "Greece",
+                "rooftop": {
+                        "scheme": "Net Billing & Subsidies.",
+                        "ref": "PV on the Roof"
+                },
+                "ground": {
+                        "scheme": "Sliding Feed-in Premium.",
+                        "ref": "RAE Tenders"
+                },
+                "onshore": {
+                        "scheme": "Sliding Feed-in Premium.",
+                        "ref": "RAE Tenders"
+                },
+                "offshore": {
+                        "scheme": "Sliding Feed-in Premium.",
+                        "ref": "National Offshore Wind Plan"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "PT": {
+                "Country": "Portugal",
+                "rooftop": {
+                        "scheme": "Self-Consumption Framework + Grants.",
+                        "ref": "PRR"
+                },
+                "ground": {
+                        "scheme": "Solar/Wind Tenders offering CfDs.",
+                        "ref": "DGEG Tenders"
+                },
+                "onshore": {
+                        "scheme": "Tenders offering CfDs.",
+                        "ref": "DGEG Tenders"
+                },
+                "offshore": {
+                        "scheme": "New Tender structures.",
+                        "ref": "DGEG Tenders"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Carbon Tax.",
+                        "ref": "State Budget Law"
+                }
+        },
+        "FI": {
+                "Country": "Finland",
+                "rooftop": {
+                        "scheme": "Investment Subsidies & Tax credits.",
+                        "ref": "Energy Aid"
+                },
+                "ground": {
+                        "scheme": "Market-based / Corporate PPAs.",
+                        "ref": "Market mechanisms"
+                },
+                "onshore": {
+                        "scheme": "Merchant / PPAs.",
+                        "ref": "Market mechanisms"
+                },
+                "offshore": {
+                        "scheme": "Subsidies for pilot projects.",
+                        "ref": "Energy Authority"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Carbon Tax.",
+                        "ref": "Energy Taxation Act"
+                }
+        },
+        "CZ": {
+                "Country": "Czech Republic",
+                "rooftop": {
+                        "scheme": "Investment Subsidies.",
+                        "ref": "New Green Savings"
+                },
+                "ground": {
+                        "scheme": "Auction-based Market Premiums.",
+                        "ref": "Modernisation Fund"
+                },
+                "onshore": {
+                        "scheme": "Auction-based Market Premiums.",
+                        "ref": "Modernisation Fund"
+                },
+                "offshore": {
+                        "scheme": "N/A.",
+                        "ref": "-"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "RO": {
+                "Country": "Romania",
+                "rooftop": {
+                        "scheme": "Investment Subsidies & Net Billing.",
+                        "ref": "Casa Verde"
+                },
+                "ground": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "Modernisation Fund CfDs"
+                },
+                "onshore": {
+                        "scheme": "Two-way CfDs.",
+                        "ref": "Modernisation Fund CfDs"
+                },
+                "offshore": {
+                        "scheme": "Developing CfD framework.",
+                        "ref": "Offshore Wind Law"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "BG": {
+                "Country": "Bulgaria",
+                "rooftop": {
+                        "scheme": "Net billing, FiTs & grants.",
+                        "ref": "NRRP"
+                },
+                "ground": {
+                        "scheme": "Sliding Premium via auctions.",
+                        "ref": "ERSA"
+                },
+                "onshore": {
+                        "scheme": "Sliding Premium.",
+                        "ref": "ERSA"
+                },
+                "offshore": {
+                        "scheme": "Unknown.",
+                        "ref": "N/A"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "HR": {
+                "Country": "Croatia",
+                "rooftop": {
+                        "scheme": "Net billing + fund rebates.",
+                        "ref": "FZOEU"
+                },
+                "ground": {
+                        "scheme": "Market Premium.",
+                        "ref": "HROTE auctions"
+                },
+                "onshore": {
+                        "scheme": "Market Premium.",
+                        "ref": "HROTE auctions"
+                },
+                "offshore": {
+                        "scheme": "Unknown.",
+                        "ref": "N/A"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "CY": {
+                "Country": "Cyprus",
+                "rooftop": {
+                        "scheme": "Net billing, VNM & capital subsidies.",
+                        "ref": "CERA"
+                },
+                "ground": {
+                        "scheme": "Competitive bidding for FiP.",
+                        "ref": "CERA"
+                },
+                "onshore": {
+                        "scheme": "Competitive bidding for FiP.",
+                        "ref": "CERA"
+                },
+                "offshore": {
+                        "scheme": "Unknown.",
+                        "ref": "N/A"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "EE": {
+                "Country": "Estonia",
+                "rooftop": {
+                        "scheme": "Investment subsidies.",
+                        "ref": "KredEx"
+                },
+                "ground": {
+                        "scheme": "Sliding Premium.",
+                        "ref": "Elering Reverse Auctions"
+                },
+                "onshore": {
+                        "scheme": "Sliding Premium.",
+                        "ref": "Elering Reverse Auctions"
+                },
+                "offshore": {
+                        "scheme": "Sliding Premium (planned).",
+                        "ref": "Elering"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National CO2 charge.",
+                        "ref": "Environmental Charges Act"
+                }
+        },
+        "HU": {
+                "Country": "Hungary",
+                "rooftop": {
+                        "scheme": "Gross settlement + subsidies.",
+                        "ref": "Napenergia Plusz"
+                },
+                "ground": {
+                        "scheme": "MET\u00c1R system (two-way CfD).",
+                        "ref": "MEKH"
+                },
+                "onshore": {
+                        "scheme": "MET\u00c1R system.",
+                        "ref": "MEKH"
+                },
+                "offshore": {
+                        "scheme": "N/A.",
+                        "ref": "-"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "LV": {
+                "Country": "Latvia",
+                "rooftop": {
+                        "scheme": "Net billing + grants.",
+                        "ref": "Altum"
+                },
+                "ground": {
+                        "scheme": "Merchant / Corporate PPAs.",
+                        "ref": "KEM"
+                },
+                "onshore": {
+                        "scheme": "Merchant / Corporate PPAs.",
+                        "ref": "KEM"
+                },
+                "offshore": {
+                        "scheme": "Merchant / PPAs.",
+                        "ref": "KEM"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Natural Resources Tax.",
+                        "ref": "Natural Resources Tax Law"
+                }
+        },
+        "LT": {
+                "Country": "Lithuania",
+                "rooftop": {
+                        "scheme": "Net billing + subsidies.",
+                        "ref": "APVA"
+                },
+                "ground": {
+                        "scheme": "Sliding Premium / CfD model.",
+                        "ref": "NERC Auctions"
+                },
+                "onshore": {
+                        "scheme": "Sliding Premium / CfD.",
+                        "ref": "NERC Auctions"
+                },
+                "offshore": {
+                        "scheme": "CfD model (planned).",
+                        "ref": "Ministry of Energy"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "LU": {
+                "Country": "Luxembourg",
+                "rooftop": {
+                        "scheme": "Guaranteed FiT or Investment subsidies.",
+                        "ref": "Klimabonus"
+                },
+                "ground": {
+                        "scheme": "Market Premium.",
+                        "ref": "Calls for Tenders"
+                },
+                "onshore": {
+                        "scheme": "Market Premium.",
+                        "ref": "Calls for Tenders"
+                },
+                "offshore": {
+                        "scheme": "N/A.",
+                        "ref": "-"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Carbon Tax.",
+                        "ref": "National Budget Law"
+                }
+        },
+        "MT": {
+                "Country": "Malta",
+                "rooftop": {
+                        "scheme": "Investment grants + fixed FiT.",
+                        "ref": "REWS"
+                },
+                "ground": {
+                        "scheme": "Feed-in Tariffs.",
+                        "ref": "REWS Bidding"
+                },
+                "onshore": {
+                        "scheme": "Feed-in Tariffs.",
+                        "ref": "REWS Bidding"
+                },
+                "offshore": {
+                        "scheme": "Unknown.",
+                        "ref": "N/A"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "SK": {
+                "Country": "Slovakia",
+                "rooftop": {
+                        "scheme": "Investment subsidies.",
+                        "ref": "Zelen\u00e1 dom\u00e1cnostiam"
+                },
+                "ground": {
+                        "scheme": "Feed-in Premium.",
+                        "ref": "Ministry of Economy"
+                },
+                "onshore": {
+                        "scheme": "Feed-in Premium.",
+                        "ref": "Ministry of Economy"
+                },
+                "offshore": {
+                        "scheme": "N/A.",
+                        "ref": "-"
+                },
+                "co2": {
+                        "scheme": "EU ETS.",
+                        "ref": "EU Directive"
+                }
+        },
+        "SI": {
+                "Country": "Slovenia",
+                "rooftop": {
+                        "scheme": "Net billing + grants.",
+                        "ref": "Borzen"
+                },
+                "ground": {
+                        "scheme": "Market Premium.",
+                        "ref": "Borzen Tenders"
+                },
+                "onshore": {
+                        "scheme": "Market Premium.",
+                        "ref": "Borzen Tenders"
+                },
+                "offshore": {
+                        "scheme": "N/A.",
+                        "ref": "-"
+                },
+                "co2": {
+                        "scheme": "EU ETS + National Carbon Tax.",
+                        "ref": "Environmental tax on CO2"
+                }
+        },
+        "UK": {
+                "Country": "United Kingdom",
+                "rooftop": {
+                        "scheme": "Smart Export Guarantee (SEG).",
+                        "ref": "Ofgem"
+                },
+                "ground": {
+                        "scheme": "Contracts for Difference (CfD).",
+                        "ref": "AR rounds"
+                },
+                "onshore": {
+                        "scheme": "Contracts for Difference (CfD).",
+                        "ref": "AR rounds"
+                },
+                "offshore": {
+                        "scheme": "Contracts for Difference (CfD).",
+                        "ref": "AR rounds"
+                },
+                "co2": {
+                        "scheme": "UK ETS + Carbon Price Support.",
+                        "ref": "UK ETS Authority"
+                }
+        },
+        "NO": {
+                "Country": "Norway",
+                "rooftop": {
+                        "scheme": "Plusskunde scheme + Investment Subsidies.",
+                        "ref": "Enova"
+                },
+                "ground": {
+                        "scheme": "Merchant / PPAs.",
+                        "ref": "NVE"
+                },
+                "onshore": {
+                        "scheme": "Merchant / PPAs.",
+                        "ref": "NVE"
+                },
+                "offshore": {
+                        "scheme": "CfD Tenders.",
+                        "ref": "Ministry of Petroleum and Energy"
+                },
+                "co2": {
+                        "scheme": "EU ETS + High National Carbon Tax.",
+                        "ref": "Norwegian Tax Administration"
+                }
+        },
+        "CH": {
+                "Country": "Switzerland",
+                "rooftop": {
+                        "scheme": "Investment Subsidies (Einmalverg\u00fctung).",
+                        "ref": "BFE / Pronovo"
+                },
+                "ground": {
+                        "scheme": "Feed-in Tariff (phasing out) / Market Premium.",
+                        "ref": "Energy Act"
+                },
+                "onshore": {
+                        "scheme": "Market Premium.",
+                        "ref": "Energy Act"
+                },
+                "offshore": {
+                        "scheme": "N/A.",
+                        "ref": "-"
+                },
+                "co2": {
+                        "scheme": "CH ETS + CO2 Levy.",
+                        "ref": "CO2 Act"
+                }
+        },
+        "BE1": {
+                "Country": "Belgium (Brussels)",
+                "rooftop": {
+                        "scheme": "Net Billing & Green Certificates.",
+                        "ref": ""
+                },
+                "ground": {
+                        "scheme": "Green Certificates (Quota).",
+                        "ref": ""
+                },
+                "onshore": {
+                        "scheme": "Green Certificates.",
+                        "ref": ""
+                },
+                "offshore": {
+                        "scheme": "Federal Two-way CfDs via tenders.",
+                        "ref": "Federal Ministry of Energy",
+                        "comment": "Allocated via competitive auctions."
+                },
+                "co2": {
+                        "scheme": "EU ETS",
+                        "ref": "EU Directive",
+                        "comment": "Active primary mechanism."
+                }
+        },
+        "BE2": {
+                "Country": "Belgium (Flanders)",
+                "rooftop": {
+                        "scheme": "Investment Subsidies.",
+                        "ref": ""
+                },
+                "ground": {
+                        "scheme": "Mixed (phasing out Quotas).",
+                        "ref": ""
+                },
+                "onshore": {
+                        "scheme": "Mixed.",
+                        "ref": ""
+                },
+                "offshore": {
+                        "scheme": "Federal Two-way CfDs via tenders.",
+                        "ref": "Federal Ministry of Energy",
+                        "comment": "Allocated via competitive auctions."
+                },
+                "co2": {
+                        "scheme": "EU ETS",
+                        "ref": "EU Directive",
+                        "comment": "Active primary mechanism."
+                }
+        },
+        "BE3": {
+                "Country": "Belgium (Wallonia)",
+                "rooftop": {
+                        "scheme": "Net Billing & Subsidies.",
+                        "ref": ""
+                },
+                "ground": {
+                        "scheme": "Regional Green Certificates.",
+                        "ref": ""
+                },
+                "onshore": {
+                        "scheme": "Regional Green Certificates.",
+                        "ref": ""
+                },
+                "offshore": {
+                        "scheme": "Federal Two-way CfDs via tenders.",
+                        "ref": "Federal Ministry of Energy",
+                        "comment": "Allocated via competitive auctions."
+                },
+                "co2": {
+                        "scheme": "EU ETS",
+                        "ref": "EU Directive",
+                        "comment": "Active primary mechanism."
+                }
+        }
+};
+    
+    function classifyScheme(text, viewType) {
+        if (!text) return CATEGORIES.NO_DATA;
+        let t = text.toLowerCase();
+        if (t.includes('n/a') || t.includes('unknown') || t === '-') return CATEGORIES.NO_DATA;
+        
+        if (viewType === 'co2') {
+            if (t.includes('tax') || t.includes('levy') || t.includes('pricing') || t.includes('charge')) return CATEGORIES.ETS_TAX;
+            return CATEGORIES.ETS_ONLY;
+        }
+        
+        if (viewType === 'rooftop') {
+            if (t.includes('net billing') || t.includes('net metering') || t.includes('settlement')) return CATEGORIES.NET_BILLING_METERING;
+            if (t.includes('subsidies') || t.includes('grants') || t.includes('tax credit')) return CATEGORIES.SUBSIDIES;
+            if (t.includes('fit') || t.includes('feed-in tariff') || t.includes('smart export') || t.includes('gross settlement')) return CATEGORIES.FIT;
+            return CATEGORIES.MIXED;
+        }
+        
+        if (t.includes('cfd') || t.includes('premium')) return CATEGORIES.CFD_FIP;
+        if (t.includes('merchant') || t.includes('ppa')) return CATEGORIES.MERCHANT;
+        if (t.includes('tender') || t.includes('auction')) return CATEGORIES.TENDERS;
+        if (t.includes('quota') || t.includes('certificate')) return CATEGORIES.QUOTA_CERT;
+        if (t.includes('fit') || t.includes('feed-in tariff')) return CATEGORIES.FIT;
+        
+        return CATEGORIES.MIXED;
+    }
+
+    let currentView = 'ground';
+
+    document.getElementById('tech-select').addEventListener('change', function(e) {
+        currentView = e.target.value;
+        if(geojsonLayer) {
+            geojsonLayer.eachLayer(function(layer) {
+                geojsonLayer.resetStyle(layer);
+            });
+            updateLegend();
+        }
+    });
+
+    function getCountryInfo(isoCode) {
+        const d = rawData[isoCode];
+        if (d) {
+            const getScheme = (key) => d[key] ? d[key].scheme : 'Unknown';
+            let activeText = "No data mapped.";
+            
+            if (currentView === 'ground') activeText = getScheme('ground');
+            else if (currentView === 'rooftop') activeText = getScheme('rooftop');
+            else if (currentView === 'onshore') activeText = getScheme('onshore');
+            else if (currentView === 'offshore') activeText = getScheme('offshore');
+            else if (currentView === 'co2') activeText = getScheme('co2');
+
+            let activeCategory = classifyScheme(activeText, currentView);
+
+            return {
+                name: d.Country,
+                activeScheme: activeText,
+                category: activeCategory,
+                fullData: d
+            };
+        } else {
+            return { name: isoCode, category: CATEGORIES.NO_DATA, activeScheme: "No data", fullData: {} };
+        }
+    }
+
+    var info = L.control({position: 'topright'});
+    info.onAdd = function (map) { this._div = L.DomUtil.create('div', 'info-panel'); this.update(); return this._div; };
+    info.update = function (props) {
+        if (!props) {
+            this._div.innerHTML = '<h4>RES Support Schemes</h4>Hover over a region...';
+            return;
+        }
+        const iso = (props.LEVL_CODE === 1) ? props.NUTS_ID : (props.NUTS_ID || props.CNTR_ID);
+        const data = getCountryInfo(iso);
+        const name = data.name || props.NAME_LATN || props.NAME_ENGL;
+        
+        if (data.category === CATEGORIES.NO_DATA && !data.fullData.Country) {
+            this._div.innerHTML = `<h4>${name}</h4><p>Information not available or not covered.</p>`;
+            return;
+        }
+
+        const f = data.fullData;
+        this._div.innerHTML = `<h4>${name}</h4>
+            <p><strong>Selected View Category:</strong> <span style="color:${COLORS[data.category]}"><b>${data.category}</b></span></p>
+            <hr>
+            <p><strong>Rooftop PV:</strong> ${f.rooftop ? f.rooftop.scheme : ''}</p>
+            <p><strong>Ground PV:</strong> ${f.ground ? f.ground.scheme : ''}</p>
+            <p><strong>Onshore Wind:</strong> ${f.onshore ? f.onshore.scheme : ''}</p>
+            <p><strong>Offshore Wind:</strong> ${f.offshore ? f.offshore.scheme : ''}</p>
+            <p style="margin-top: 8px; border-top: 1px dotted #ccc; padding-top: 5px;"><strong>CO2 Mechanism:</strong> ${f.co2 ? f.co2.scheme : ''}</p>
+        `;
+    };
+    info.addTo(map);
+
+    
+    function style(feature) {
+        const iso = (feature.properties.LEVL_CODE === 1) ? feature.properties.NUTS_ID : (feature.properties.NUTS_ID || feature.properties.CNTR_ID);
+        const data = getCountryInfo(iso);
+        let fillColor = COLORS[data.category] || COLORS[CATEGORIES.NO_DATA];
+        let fillOpacity = (data.category === CATEGORIES.NO_DATA) ? 0.2 : 0.8;
+        return { fillColor: fillColor, weight: 1.5, opacity: 1, color: '#ffffff', fillOpacity: fillOpacity };
+    }
+
+    function highlightFeature(e) {
+        var layer = e.target;
+        layer.setStyle({ weight: 2, color: '#222', fillOpacity: 1 });
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) layer.bringToFront();
+        info.update(layer.feature.properties);
+    }
+
+    function resetHighlight(e) { geojsonLayer.resetStyle(e.target); info.update(); }
+    function onEachFeature(feature, layer) { layer.on({ mouseover: highlightFeature, mouseout: resetHighlight }); }
+
+    var geojsonLayer;
+    
+    Promise.all([
+        fetch('https://gisco-services.ec.europa.eu/distribution/v2/countries/geojson/CNTR_RG_20M_2024_4326.geojson').then(r => r.json()),
+        fetch('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_20M_2024_4326_LEVL_1.geojson').then(r => r.json())
+    ]).then(([nuts0, nuts1]) => {
+        var features = nuts0.features.filter(f => f.properties.CNTR_ID !== 'BE');
+        var beRegions = nuts1.features.filter(f => f.properties.CNTR_CODE === 'BE');
+        features = features.concat(beRegions);
+        
+        var combinedGeoJSON = { "type": "FeatureCollection", "features": features };
+        geojsonLayer = L.geoJson(combinedGeoJSON, {
+            style: style,
+            onEachFeature: onEachFeature
+        }).addTo(map);
+        
+        updateLegend();
+    });
+
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'legend');
+        return this._div;
+    };
+    function updateLegend() {
+        if(!legend._div) return;
+        let html = '<strong>Categories (Current View)</strong><br><br>';
+        
+        let usedCats = new Set();
+        if(geojsonLayer) {
+            geojsonLayer.eachLayer(function(layer) {
+                const iso = layer.feature.properties.NUTS_ID || layer.feature.properties.CNTR_ID;
+                usedCats.add(getCountryInfo(iso).category);
+            });
+        }
+        
+        for (const [key, label] of Object.entries(CATEGORIES)) {
+            if(usedCats.has(label) || label === CATEGORIES.NO_DATA) {
+                html += '<i style="background:' + COLORS[label] + '"></i> ' + label + '<br>';
+            }
+        }
+        legend._div.innerHTML = html;
+    }
+    legend.addTo(map);
+
+</script>
+</body>
+</html>
