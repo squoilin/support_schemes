@@ -1,0 +1,15 @@
+{
+  "name": "support_schemes_res",
+  "version": "1.0.0",
+  "description": "This repository tracks and visualizes the principal renewable energy support schemes and CO2 pricing mechanisms across the 27 EU member states, plus the United Kingdom (UK), Norway (NO), and Switzerland (CH).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^24.40.0"
+  }
+}
