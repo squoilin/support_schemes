@@ -17,11 +17,17 @@ You can also view it locally by opening `index.html` in any web browser. The Lea
 
 The data representing the 2024-2026 policy framework has been thoroughly synthesized, triangulated, and inferred from the following primary resources indicating structural shifts towards the 2030 targets:
 
-1. **RES LEGAL Europe:** Database on support schemes and grid issues for renewable energy in the EU.
-2. **IEA (International Energy Agency) Policies Database:** Global coverage of country-level energy policies.
-3. **IRENA (International Renewable Energy Agency):** Tracks structural energy schemes globally.
-4. **European Commission - National Energy and Climate Plans (NECPs):** Source of up-to-date (2024 revised) country projections.
+1. **RES LEGAL Europe:** Database on support schemes and grid issues for renewable energy in the EU (http://www.res-legal.eu/).
+2. **IEA (International Energy Agency) Policies Database:** Global coverage of country-level energy policies (https://www.iea.org/policies).
+3. **IRENA (International Renewable Energy Agency):** Tracks structural energy schemes globally (https://www.irena.org/).
+4. **European Commission - National Energy and Climate Plans (NECPs):** Source of up-to-date (2024 revised) country projections (https://energy.ec.europa.eu/).
 5. **National Regulatory Portals:** Localized portals tracking direct tendering mechanisms (e.g., Borzen, HROTE, BNetzA, NERC).
+
+All entries in the tables are referenced back to their original policy documents or legislative acts for full traceability.
+
+### Timing and Updates
+
+The support schemes data covers the policy frameworks primarily active between **2024 and 2026**. The dataset specifically reflects transition periods, as many EU member states are phasing out legacy schemes (like Quotas and Net Metering) during 2024-2025 in favor of competitive mechanisms (e.g., CfDs via auctions) or market-reflective premiums (e.g., Net Billing) required by the recent EU Electricity Market Design directives. We aim to keep the data as current as reasonably possible in relation to major regulatory updates.
 
 ## General Policy Categories
 
@@ -33,7 +39,7 @@ Policy mechanisms for renewable energy span complex definitions. For the purpose
 * **Net Billing / Net Metering:** Prosumer mechanisms. Net Metering balances kWh against kWh over a specified period. Net Billing, taking over most legacy systems, strictly monetizes the surplus energy at a designated wholesale/market rate and charges retail price for consumed grid energy.
 * **Investment Subsidies / Grants:** Upfront capital expenditure support (CapEx subsidies) largely funded by EU Recovery and Resilience Facilities (RRF). Extremely prevalent for decentralised systems like Rooftop PV + Local Battery Storage.
 * **Quotas / Green Certificates (TGCs):** An obligation on suppliers or large consumers to source a determined % of their electricity from renewables, proved via tradable certificates. Mostly a legacy mechanism being phased out (e.g., Flanders, Sweden).
-* **Merchant / Corporate PPAs:** Projects completely funded outside state aid schemes, relying exclusively on wholesale market revenues or direct long-term Power Purchase Agreements (PPAs) with large corporate consumers.
+* **Merchant / Corporate PPAs:** Projects completely funded outside state aid schemes, relying exclusively on wholesale market revenues or direct long-term Power Purchase Agreements (PPAs) with large corporate consumers. While not a traditional "support scheme" subsidized by public funds, these represent the market-driven policy objective where technologies have reached grid parity and no longer require public risk-hedging mechanisms.
 * **ETS & Carbon Tax/Levy (CO2):** Nearly all assessed nations operate under the EU Emissions Trading System (cap-and-trade). Nations designated as "ETS + Tax" mandate specific internal national carbon floor prices or specific carbon taxes largely focused on non-ETS sectors (e.g., heating, transport, small industry).
 
 ## Detailed Tables

@@ -1001,7 +1001,7 @@
         }
         
         for (const [key, label] of Object.entries(CATEGORIES)) {
-            if(usedCats.has(label) || label === CATEGORIES.NO_DATA) {
+            if(usedCats.has(label) && label !== CATEGORIES.NO_DATA) {
                 html += '<i style="background:' + COLORS[label] + '"></i> ' + label + '<br>';
             }
         }

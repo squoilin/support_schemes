@@ -6,8 +6,8 @@
 | --- | --- | --- | --- |
 | Austria (AT) | Market Premiums (Sliding FiP). | EAG Auctions | - |
 | Belgium (Brussels) (BE1) | Green Certificates (Quota). |  | - |
-| Belgium (Flanders) (BE2) | Mixed (phasing out Quotas). |  | - |
-| Belgium (Wallonia) (BE3) | Regional Green Certificates. |  | - |
+| Belgium (Flanders) (BE2) | Mixed (phasing out Quotas, moving to direct grants). | [Flemish Energy Agency (VEKA)](https://www.vlaanderen.be/veka) | Quota system being phased out; transition to investment support and targeted tenders for large PV. |
+| Belgium (Wallonia) (BE3) | Regional Green Certificates. | [CWaPE](https://www.cwape.be/) | Multiplier-based envelope mechanism. |
 | Bulgaria (BG) | Sliding Premium via auctions. | ERSA | - |
 | Croatia (HR) | Market Premium. | HROTE auctions | - |
 | Cyprus (CY) | Competitive bidding for FiP. | CERA | - |
@@ -33,8 +33,8 @@
 | Slovakia (SK) | Feed-in Premium. | Ministry of Economy | - |
 | Slovenia (SI) | Market Premium. | Borzen Tenders | - |
 | Spain (ES) | REER Pay-as-bid Tender. | REER | - |
-| Sweden (SE) | Merchant / Corporate PPAs. | Market mechanisms | - |
-| Switzerland (CH) | Feed-in Tariff (phasing out) / Market Premium. | Energy Act | - |
+| Sweden (SE) | Merchant / Corporate PPAs (Elcertifikat phased out). | [Swedish Energy Agency](https://www.energimyndigheten.se) | The long-standing green certificate system closed to new entrants in 2021/2022; large-scale PV is now largely driven by corporate PPAs and merchant risk. |
+| Switzerland (CH) | Mixed: Feed-in Tariff (phasing out) & Market Premium. | [SFOE / Pronovo](https://www.pronovo.ch/) | The legacy KEV feed-in tariff was phased out for new plants; newer installations participate in market premiums and sliding models. |
 | United Kingdom (UK) | Contracts for Difference (CfD). | AR rounds | - |
 
 ## Rooftop Solar PV
@@ -43,7 +43,7 @@
 | --- | --- | --- | --- |
 | Austria (AT) | Investment Grants. | EAG | - |
 | Belgium (Brussels) (BE1) | Net Billing & Green Certificates. |  | - |
-| Belgium (Flanders) (BE2) | Investment Subsidies. |  | - |
+| Belgium (Flanders) (BE2) | Investment Subsidies & Net Billing. | [VEKA](https://www.vlaanderen.be/veka) | Subsidies shrinking over time as grid parity is reached; self-consumption favored. |
 | Belgium (Wallonia) (BE3) | Net Billing & Subsidies. |  | - |
 | Bulgaria (BG) | Net billing, FiTs & grants. | NRRP | - |
 | Croatia (HR) | Net billing + fund rebates. | FZOEU | - |
@@ -62,9 +62,9 @@
 | Lithuania (LT) | Net billing + subsidies. | APVA | - |
 | Luxembourg (LU) | Guaranteed FiT or Investment subsidies. | Klimabonus | - |
 | Malta (MT) | Investment grants + fixed FiT. | REWS | - |
-| Netherlands (NL) | Net Metering (facing phase-out). | Salderingsregeling | - |
+| Netherlands (NL) | Net Metering. | [Rijksoverheid](https://www.rijksoverheid.nl/) | Phase-out proposal was rejected in February 2024; the net metering scheme (salderingsregeling) remains actively in place for now. |
 | Norway (NO) | Plusskunde scheme + Investment Subsidies. | Enova | - |
-| Poland (PL) | Net Billing & Investment Subsidies. | Mój Prąd | - |
+| Poland (PL) | Net Billing & Investment Subsidies. | [Mój Prąd](https://mojprad.gov.pl/) | Transitioned from net metering to net billing in April 2022. Subsidy programs extended to 2025. |
 | Portugal (PT) | Self-Consumption Framework + Grants. | PRR | - |
 | Romania (RO) | Investment Subsidies & Net Billing. | Casa Verde | - |
 | Slovakia (SK) | Investment subsidies. | Zelená domácnostiam | - |
@@ -80,8 +80,8 @@
 | --- | --- | --- | --- |
 | Austria (AT) | Market Premiums. | EAG Auctions | - |
 | Belgium (Brussels) (BE1) | Green Certificates. |  | - |
-| Belgium (Flanders) (BE2) | Mixed. |  | - |
-| Belgium (Wallonia) (BE3) | Regional Green Certificates. |  | - |
+| Belgium (Flanders) (BE2) | Mixed (transitioning from quotas to premiums). | [Flemish Energy Agency (VEKA)](https://www.vlaanderen.be/veka) | Quota system being gradually withdrawn for wind; shifting to premium-based support. |
+| Belgium (Wallonia) (BE3) | Regional Green Certificates. | [CWaPE](https://www.cwape.be/) | Multiplier-based envelope mechanism. |
 | Bulgaria (BG) | Sliding Premium. | ERSA | - |
 | Croatia (HR) | Market Premium. | HROTE auctions | - |
 | Cyprus (CY) | Competitive bidding for FiP. | CERA | - |
@@ -107,7 +107,7 @@
 | Slovakia (SK) | Feed-in Premium. | Ministry of Economy | - |
 | Slovenia (SI) | Market Premium. | Borzen Tenders | - |
 | Spain (ES) | REER Pay-as-bid Tender. | REER | - |
-| Sweden (SE) | Merchant / Corporate PPAs. | Market mechanisms | - |
+| Sweden (SE) | Merchant / Corporate PPAs (Elcertifikat phased out). | [Swedish Energy Agency](https://www.energimyndigheten.se) | Green certificate scheme closed; wind operates largely on merchant basis or corporate PPAs. |
 | Switzerland (CH) | Market Premium. | Energy Act | - |
 | United Kingdom (UK) | Contracts for Difference (CfD). | AR rounds | - |
 
