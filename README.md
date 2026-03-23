@@ -5,7 +5,10 @@ This repository tracks and visualizes the principal renewable energy support sch
 ## Live Interactive Map
 
 The primary deliverable of this repository is a dynamic, interactive geographic visualization. 
-Open `index.html` in any web browser to view the Leaflet.js-based interactive map. It features:
+
+🌍 **[View the Live Interactive Map Here](https://squoilin.github.io/support_schemes/)**
+
+You can also view it locally by opening `index.html` in any web browser. The Leaflet.js-based interactive map features:
 * **Technology Dropdowns:** Switch between Rooftop PV, Ground-mounted PV, Onshore Wind, Offshore Wind, and CO2 mechanisms.
 * **Dynamic Recategorization:** Recalculates scheme models and updates legend colors depending on the subset viewed.
 * **Boundary Sub-Regionalization:** E.g., accurately dividing Belgium into its three energy jurisdictions (Flanders, Wallonia, Brussels) overlaid on the NUTS/CNTR base vectors.
